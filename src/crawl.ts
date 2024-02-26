@@ -70,14 +70,4 @@ export async function fetchPage(url: string): Promise<string | null> {
     }
 }
 
-/***
- * Crawl runs untill all urls are exhausted/visited and parsed.
- * 
- */
-export async function crawl(url: string) {
-
-
-
-}
-
 export const pause = (ms: number) => new Promise(res => setTimeout(res, ms));
