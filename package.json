@@ -1,0 +1,17 @@
+{
+  "name": "crawler",
+  "version": "1.0.0",
+  "description": "web crawler experiment",
+  "main": "index.js",
+  "scripts": {
+    "start-dev": "tsc-watch --onSuccess \" nodemon ./dist/main.js \""
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "nodemon": "^3.1.0",
+    "tsc-watch": "^6.0.4",
+    "typescript": "^5.3.3"
+  }
+}
