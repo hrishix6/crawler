@@ -1,4 +1,5 @@
 {
+  "exclude": ["node_modules","tests","e2e","playwright.config.ts","dist"],
   "compilerOptions": {
     "target": "ESNext",                                  /* Set the JavaScript language version for emitted JavaScript and include compatible library declarations. */
     "module": "NodeNext",                                /* Specify what module code is generated. */

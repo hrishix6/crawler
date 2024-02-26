@@ -4,14 +4,24 @@
   "description": "web crawler experiment",
   "main": "index.js",
   "scripts": {
-    "start-dev": "tsc-watch --onSuccess \" nodemon ./dist/main.js \""
+    "start-dev": "tsc-watch --onSuccess \" nodemon ./dist/main.js \"",
+    "test": "playwright test",
+    "build": "tsc"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "devDependencies": {
+    "@playwright/test": "^1.41.2",
+    "@types/jsdom": "^21.1.6",
+    "@types/node": "^20.11.20",
+    "@types/node-fetch": "^2.6.11",
     "nodemon": "^3.1.0",
     "tsc-watch": "^6.0.4",
     "typescript": "^5.3.3"
+  },
+  "dependencies": {
+    "jsdom": "^24.0.0",
+    "node-fetch": "^2.7.0"
   }
 }
