@@ -45,7 +45,6 @@ async function main() {
             const normalizedUrl = normalizeURL(current);
 
             if (normalizedUrl in info) {
-                console.log(`already crawled  ${current}`);
                 info[normalizedUrl].visited++;
                 continue;
             }
@@ -53,11 +52,15 @@ async function main() {
             const html = await fetchPage(current);
             if (!html) {
                 console.log(`No html content found at ${current}, moving on.`);
+                info[normalizedUrl] = {
+                    extLinksCount: 0,
+                    internalLinksCount: 0,
+                    visited: 1
+                };
                 continue;
             }
 
             console.log(`Crawled ${current}, extracting urls..`);
-
             const meta = getUrlsFromHtml(current, html, baseUrl);
 
             const { url, externalLinks, internalLinks } = meta;
@@ -73,21 +76,16 @@ async function main() {
 
         const end = new Date();
         console.log(`Finished crawling ${baseUrl} in ${end.getTime() - start.getTime()}ms`);
-        console.log(`Summary=====================================================`);
 
-        for (let [k, v] of Object.entries(info)) {
-            console.log(`Url - ${k} | Visits - ${v.visited} | internal Links - ${v.internalLinksCount} | external Links - ${v.extLinksCount}`);
-        }
+        const summary = Object.keys(info).map(x => ({
+            url: x,
+            ...info[x]
+        }));
+
+        console.table(summary);
 
     } catch (error) {
-        const e = error as Error;
-
         console.log(error);
-
-        if (e.name === "TypeError") {
-            console.error("Invalid base url");
-            process.exit(1);
-        }
     }
 }
 main();
