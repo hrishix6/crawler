@@ -8,7 +8,8 @@ export function normalizeURL(url: string) {
 
 interface URLInfo {
     url: string;
-    links: string[];
+    internalLinks: string[];
+    externalLinks: string[];
 }
 
 export function getUrlsFromHtml(url: string, html: string, baseUrl: string) {
@@ -17,23 +18,34 @@ export function getUrlsFromHtml(url: string, html: string, baseUrl: string) {
     });
 
     const { document } = dom.window;
-
-    const title = document.querySelector("head")?.title;
-
     const linkEls = document.querySelectorAll("a");
 
     const info: URLInfo = {
         url: normalizeURL(url),
-        links: []
+        internalLinks: [],
+        externalLinks: []
     }
 
     if (!linkEls || linkEls.length == 0) {
         return info;
     }
 
-    info.links = Array.from(linkEls).map(x => x.href);
+    for (let link of linkEls) {
+
+        if (IsInternalUrl(link.href, baseUrl)) {
+            info.internalLinks.push(link.href);
+        }
+        else {
+            info.externalLinks.push(link.href);
+        }
+    }
+
 
     return info;
+}
+
+export function IsInternalUrl(url: string, baseUrl: string) {
+    return new URL(url).hostname === new URL(baseUrl).hostname;
 }
 
 

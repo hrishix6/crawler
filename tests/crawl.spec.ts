@@ -21,6 +21,6 @@ test("extract urls from html", () => {
 
     const got = getUrlsFromHtml("https://blog.boot.dev", domString, "https://blog.boot.dev");
     console.log(got[0]);
-    expect(got.links.length).toBe(1);
+    expect(got.internalLinks.length).toBe(1);
 
 });

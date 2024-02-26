@@ -15,11 +15,8 @@ async function main() {
             process.exit(1);
         }
 
-        const crawled = new Set<string>();
         const urls: string[] = [];
-        const info: Record<string, number> = {};
-        const normalizedUrl = normalizeURL(baseUrl);
-
+        const info: Record<string, { internalLinksCount: number, extLinksCount: number, visited: number }> = {};
         const start = new Date();
         console.log(`crawling base url...`);
 
@@ -30,35 +27,26 @@ async function main() {
             process.exit(0);
         }
 
-        crawled.add(baseUrl);
+        const { externalLinks, internalLinks, url } = getUrlsFromHtml(baseUrl, html, baseUrl);
+        info[url] = {
+            visited: 1,
+            extLinksCount: externalLinks.length,
+            internalLinksCount: internalLinks.length
+        };
 
-        if (!baseUrl.endsWith("/")) {
-            crawled.add(`${baseUrl}/`);
-        }
+        urls.push(...internalLinks);
 
-        const baseUrlInfo = getUrlsFromHtml(baseUrl, html, baseUrl);
-
-        if (normalizedUrl in info) {
-            info[normalizedUrl]++;
-        }
-        else {
-            info[normalizedUrl] = 0;
-        }
-
-        const links2Process = baseUrlInfo.links.filter(x => x.startsWith(baseUrl));
-
-        urls.push(...links2Process);
-
-        //infinite loop.
         while (urls.length) {
             const current = urls.pop();
             if (!current) {
                 continue;
             }
 
-            if (crawled.has(current)) {
+            const normalizedUrl = normalizeURL(current);
+
+            if (normalizedUrl in info) {
                 console.log(`already crawled  ${current}`);
-                info[normalizeURL(current)]++;
+                info[normalizedUrl].visited++;
                 continue;
             }
 
@@ -68,16 +56,15 @@ async function main() {
                 continue;
             }
 
-            crawled.add(current);
             console.log(`Crawled ${current}, extracting urls..`);
 
             const meta = getUrlsFromHtml(current, html, baseUrl);
 
-            info[meta.url] = 1;
+            const { url, externalLinks, internalLinks } = meta;
 
-            const urls2Process = meta.links.filter(x => normalizeURL(x) === normalizedUrl);
+            info[url] = { visited: 1, extLinksCount: externalLinks.length, internalLinksCount: internalLinks.length };
 
-            urls.push(...urls2Process);
+            urls.push(...internalLinks);
 
             //artificial delay to not cause spam.
             console.log('drinking coffee...');
@@ -85,17 +72,17 @@ async function main() {
         }
 
         const end = new Date();
-
         console.log(`Finished crawling ${baseUrl} in ${end.getTime() - start.getTime()}ms`);
-
-        console.log(`Summary \n`);
+        console.log(`Summary=====================================================`);
 
         for (let [k, v] of Object.entries(info)) {
-            console.log(`Url - ${k} | Visits - ${v}`);
+            console.log(`Url - ${k} | Visits - ${v.visited} | internal Links - ${v.internalLinksCount} | external Links - ${v.extLinksCount}`);
         }
 
     } catch (error) {
         const e = error as Error;
+
+        console.log(error);
 
         if (e.name === "TypeError") {
             console.error("Invalid base url");
